@@ -43,6 +43,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+
+class StudentProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+
+        fields = [
+            'id',
+            'full_name',
+            'email',
+            'mobile_number',
+            'parents_number',
+            'date_of_birth',
+           
+        ]
+
+        read_only_fields = [
+            'id',
+            'email'
+        ]
+
 class TeacherProfileSerializer(serializers.ModelSerializer):
 
     teacher_name = serializers.CharField(
