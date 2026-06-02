@@ -1,6 +1,6 @@
 from rest_framework import serializers
+from .models import Course,DemoSlot, DemoBooking
 
-from .models import Course
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -27,3 +27,16 @@ class CourseSerializer(serializers.ModelSerializer):
             'demo_video',
             'created_at',
         ]
+
+class DemoSlotSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DemoSlot
+        fields = '__all__'
+
+class DemoBookingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DemoBooking
+        fields = '__all__'
+        read_only_fields = ['student']

@@ -6,6 +6,7 @@ from .models import CustomUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import APIException
 
 
 class RegisterView(generics.CreateAPIView):
