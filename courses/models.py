@@ -10,7 +10,7 @@ class Course(models.Model):
     )
 
     instructor= models.ForeignKey(
-        CustomUser,
+        TeacherProfile,
         on_delete=models.CASCADE,
         limit_choices_to={'role': 'teacher'}
     )
@@ -46,7 +46,7 @@ class Course(models.Model):
 class DemoSlot(models.Model):
 
     teacher = models.ForeignKey(
-        CustomUser,
+        TeacherProfile,
         on_delete=models.CASCADE,
         limit_choices_to={'role': 'teacher'}
     )

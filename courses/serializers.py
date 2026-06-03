@@ -5,8 +5,8 @@ from .models import Course,DemoSlot, DemoBooking
 
 class CourseSerializer(serializers.ModelSerializer):
 
-    instructor_name = serializers.CharField(
-        source='instructor_name.full_name',
+    instructor = serializers.CharField(
+        source='instructor.full_name',
         read_only=True
     )
 
@@ -17,7 +17,7 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
-            'instructor_name',
+            'instructor',
             'thumbnail',
             'description',
             'about_course',
