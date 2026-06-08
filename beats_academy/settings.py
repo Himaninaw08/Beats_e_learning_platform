@@ -26,8 +26,11 @@ SECRET_KEY = 'django-insecure-0*j^6xgwtgidb)m4u6669vv0=4b8(z(282ap6yqff&@myvdnvf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    "himaninawale.pythonanywhere.com",
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 
@@ -43,6 +46,7 @@ INSTALLED_APPS = [
     'courses',
     "rest_framework",
     'rest_framework_simplejwt.token_blacklist',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -79,14 +83,21 @@ WSGI_APPLICATION = 'beats_academy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'music_academy',
+#         'USER': 'root',
+#         'PASSWORD': 'root',
+#         'HOST': 'localhost',
+#         'PORT': '3306',        
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'music_academy',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',        
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -97,6 +108,8 @@ REST_FRAMEWORK = {
     ),
     'EXCEPTION_HANDLER':
     'accounts.utils.custom_exception_handler',
+
+     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -139,6 +152,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD ="django.db.models.BigAutoField"
 
 AUTH_USER_MODEL='accounts.CustomUser'
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
