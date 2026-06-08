@@ -4,8 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from .models import Course, DemoSlot,DemoBooking
-from .serializers import CourseSerializer,DemoSlotSerializer,DemoBookingSerializer
+from .serializers import CourseSerializer,DemoSlotSerializer,DemoBookingSerializer,DemoBookingDetailSerializer
 from rest_framework.exceptions import NotFound
+from .utils import api_response
+
 
 
 class CourseListView(APIView):
@@ -21,14 +23,13 @@ class CourseListView(APIView):
             many=True
         )
 
-        return Response(
-            {
-                "status": True,
-                "message": "Courses fetched successfully",
-                "data": serializer.data
-            },
-            status=status.HTTP_200_OK
-        )
+    
+        return api_response(
+              True,
+             "Courses fetched successfully",
+              serializer.data,
+              200
+)
 
 
 class CourseDetailView(APIView):
@@ -47,14 +48,12 @@ class CourseDetailView(APIView):
 
         serializer = CourseSerializer(course)
 
-        return Response(
-            {
-                "status": True,
-                "message": "Course fetched successfully",
-                "data": serializer.data
-            },
-            status=status.HTTP_200_OK
-        )
+        return api_response(
+              True,
+              "Course fetched successfully",
+              serializer.data,
+              status.HTTP_200_OK
+)
     
 class DemoSlotListView(APIView):
 
@@ -72,7 +71,12 @@ class DemoSlotListView(APIView):
             many=True
         )
 
-        return Response(serializer.data)
+        return api_response(
+           True,
+           "Slots fetched successfully",
+           serializer.data,
+           status.HTTP_200_OK
+)
     
 class BookDemoClassView(APIView):
 
@@ -96,10 +100,12 @@ class BookDemoClassView(APIView):
 
         except Exception:
 
-            return Response(
-                {"error": "Invalid data"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return api_response(
+                 False,
+                 "Invalid course or slot",
+                 None,
+                 status.HTTP_400_BAD_REQUEST
+)
 
         booking = DemoBooking.objects.create(
             student=request.user,
@@ -112,10 +118,43 @@ class BookDemoClassView(APIView):
         slot.is_booked = True
         slot.save()
 
-        return Response(
-            {
-                "message": "Demo Class Booked Successfully",
-                "booking_id": booking.id
-            },
-            status=status.HTTP_201_CREATED
+        return api_response(
+          True,
+          "Demo Class Booked Successfully",
+          {
+              "booking_id": booking.id
+          },
+          status.HTTP_201_CREATED
+)
+    
+class DemoBookingDetailView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, booking_id):
+
+        try:
+
+            booking = DemoBooking.objects.get(
+                id=booking_id,
+                student=request.user
+            )
+
+        except DemoBooking.DoesNotExist:
+
+            return api_response(
+               False,
+               "Booking not found",
+               None,
+               status.HTTP_404_NOT_FOUND
+)
+        serializer = DemoBookingDetailSerializer(
+            booking
         )
+
+        return api_response(
+              True,
+              "Booking details fetched successfully",
+              serializer.data,
+              status.HTTP_200_OK
+)

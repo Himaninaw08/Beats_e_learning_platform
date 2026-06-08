@@ -1,4 +1,5 @@
 from rest_framework.views import exception_handler
+from rest_framework.response import Response
 
 def custom_exception_handler(exc, context):
 
@@ -26,3 +27,18 @@ def custom_exception_handler(exc, context):
         }
 
     return response
+
+def api_response(
+    status_bool,
+    message,
+    data=None,
+    http_status=200
+):
+    return Response(
+        {
+            "status": status_bool,
+            "message": message,
+            "data": data
+        },
+        status=http_status
+    )

@@ -4,7 +4,8 @@ from .views import (
     CourseListView,
     CourseDetailView,
     DemoSlotListView,
-    BookDemoClassView
+    BookDemoClassView,
+    DemoBookingDetailView
 )
 
 urlpatterns = [
@@ -31,5 +32,10 @@ urlpatterns = [
         'book-demo/',
         BookDemoClassView.as_view(),
         name='book-demo'
+    ),
+
+    path(
+        'demo-booking/<int:booking_id>/',
+        DemoBookingDetailView.as_view()
     ),
 ]

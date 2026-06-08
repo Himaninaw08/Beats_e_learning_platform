@@ -12,10 +12,16 @@ class Course(models.Model):
     instructor= models.ForeignKey(
         TeacherProfile,
         on_delete=models.CASCADE,
-        limit_choices_to={'role': 'teacher'}
+        limit_choices_to={'user__role': 'teacher'}
     )
 
     title = models.CharField(max_length=255)
+
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
 
     thumbnail = models.ImageField(
         upload_to='course_thumbnails/'
@@ -48,7 +54,7 @@ class DemoSlot(models.Model):
     teacher = models.ForeignKey(
         TeacherProfile,
         on_delete=models.CASCADE,
-        limit_choices_to={'role': 'teacher'}
+        limit_choices_to={'user__role': 'teacher'}
     )
 
     date = models.DateField()
@@ -60,7 +66,7 @@ class DemoSlot(models.Model):
     )
 
     def __str__(self):
-        return f"{self.teacher.username} - {self.date}"
+        return f"{self.teacher.user.email} - {self.date}"
     
 class DemoBooking(models.Model):
 
@@ -102,4 +108,4 @@ class DemoBooking(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.username} - {self.course.title}"    
+        return f"{self.student.email} - {self.course.title}"    
