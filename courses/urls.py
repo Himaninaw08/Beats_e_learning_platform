@@ -4,8 +4,10 @@ from .views import (
     CourseListView,
     CourseDetailView,
     DemoSlotListView,
-    BookDemoClassView,
-    DemoBookingDetailView
+    BookClassView,
+    CourseBookingDetailView,
+    CreatePaymentView,
+    PaymentDetailView,
 )
 
 urlpatterns = [
@@ -23,19 +25,29 @@ urlpatterns = [
     ),
 
     path(
-        'teachers/<int:teacher_id>/slots/',
+        'teachers/<int:course_id>/slots/',
         DemoSlotListView.as_view(),
         name='demo-slots'
     ),
 
     path(
         'book-demo/',
-        BookDemoClassView.as_view(),
+        BookClassView.as_view(),
         name='book-demo'
     ),
 
     path(
         'demo-booking/<int:booking_id>/',
-        DemoBookingDetailView.as_view()
+        CourseBookingDetailView.as_view()
     ),
+
+    path(
+    'payments/create/',
+    CreatePaymentView.as_view()
+    ),
+
+    path(
+    'payments/<int:payment_id>/',
+        PaymentDetailView.as_view()
+    ),  
 ]

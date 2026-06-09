@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, DemoSlot, DemoBooking
+from .models import Course, DemoSlot, CourseBooking
 
 
 @admin.register(Course)
@@ -35,8 +35,8 @@ class DemoSlotAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(DemoBooking)
-class DemoBookingAdmin(admin.ModelAdmin):
+@admin.register(CourseBooking)
+class CourseBookingAdmin(admin.ModelAdmin):
 
     list_display = (
         'id',

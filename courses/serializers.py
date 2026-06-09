@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Course,DemoSlot, DemoBooking
+from .models import Course,DemoSlot, CourseBooking,Payment
 
-class CourseSerializer(serializers.ModelSerializer):
+class CourseListSerializer(serializers.ModelSerializer):
 
     instructor = serializers.CharField(
         source='instructor.full_name',
@@ -9,23 +9,56 @@ class CourseSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-
         model = Course
+        fields = [
+            'id',
+            'title',
+            'rating',
+            'thumbnail',
+            'instructor',
+            'duration',
+            'level',
+            'price',
+        ]
 
+class CourseDetailSerializer(serializers.ModelSerializer):
+
+    instructor = serializers.CharField(
+        source='instructor.full_name',
+        read_only=True
+    )
+
+    class Meta:
+        model = Course
         fields = [
             'id',
             'title',
             'price',
-            'instructor',
-            'thumbnail',
-            'description',
             'about_course',
-            'what_you_will_learn',
+            'instructor',
             'duration',
             'level',
-            'demo_video',
-            'created_at',
         ]
+
+class BookClassSerializer(serializers.ModelSerializer):
+
+    course_name = serializers.CharField(
+        source='title',
+        read_only=True
+    )
+
+    teacher_name = serializers.CharField(
+        source='instructor.full_name',
+        read_only=True
+    )
+
+    class Meta:
+        model = Course
+        fields = [
+            'id',
+            'course_name',
+            'teacher_name'
+        ]        
 
 class DemoSlotSerializer(serializers.ModelSerializer):
 
@@ -33,14 +66,14 @@ class DemoSlotSerializer(serializers.ModelSerializer):
         model = DemoSlot
         fields = '__all__'
 
-class DemoBookingSerializer(serializers.ModelSerializer):
+class CourseBookingSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = DemoBooking
+        model = CourseBooking
         fields = '__all__'
         read_only_fields = ['student']
 
-class DemoBookingDetailSerializer(serializers.ModelSerializer):
+class CourseBookingDetailSerializer(serializers.ModelSerializer):
 
     course_title = serializers.CharField(
         source='course.title',
@@ -58,28 +91,40 @@ class DemoBookingDetailSerializer(serializers.ModelSerializer):
         source='teacher.full_name',
         read_only=True
     )
-
-    student_name = serializers.CharField(
-        source='student.full_name',
+    booking_date = serializers.DateField(
+        source='slot.date',
         read_only=True
     )
 
-    student_email = serializers.EmailField(
-        source='student.email',
+    booking_time = serializers.TimeField(
+        source='slot.time',
         read_only=True
     )
 
+    
     class Meta:
-
-        model = DemoBooking
+        model = CourseBooking
 
         fields = [
             'id',
             'course_title',
             'course_price',
             'teacher_name',
-            'student_name',
-            'student_email',
-            'status',
-            'created_at'
+            'booking_date',
+            'booking_time',
+            
+        ]
+
+class PaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Payment
+        fields = [
+            'id',
+            'booking',
+            'amount',
+            'payment_method',
+            'payu_transaction_id',
+            'payu_payment_id',
+            'status'
         ]

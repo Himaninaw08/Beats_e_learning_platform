@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from .models import Course, DemoSlot,DemoBooking
-from .serializers import CourseSerializer,DemoSlotSerializer,DemoBookingSerializer,DemoBookingDetailSerializer
+from .models import Course, DemoSlot, CourseBooking,Payment
+from .serializers import CourseListSerializer,CourseDetailSerializer,DemoSlotSerializer,CourseBookingSerializer,CourseBookingDetailSerializer,PaymentSerializer
 from rest_framework.exceptions import NotFound
 from .utils import api_response
 
@@ -18,11 +18,10 @@ class CourseListView(APIView):
 
         courses = Course.objects.all().order_by('-created_at')
 
-        serializer = CourseSerializer(
-            courses,
-            many=True
-        )
-
+        serializer = CourseListSerializer(
+         courses,
+         many=True
+)
     
         return api_response(
               True,
@@ -46,7 +45,7 @@ class CourseDetailView(APIView):
 
             raise NotFound("Course not found")
 
-        serializer = CourseSerializer(course)
+        serializer = CourseDetailSerializer(course)
 
         return api_response(
               True,
@@ -59,12 +58,18 @@ class DemoSlotListView(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, teacher_id):
+    def get(self, request, course_id):
+
+        try:
+           course = Course.objects.get(id=course_id)
+
+        except Course.DoesNotExist:
+            raise NotFound("Course not found")
 
         slots = DemoSlot.objects.filter(
-            teacher_id=teacher_id,
+            teacher=course.instructor,
             is_booked=False
-        )
+)
 
         serializer = DemoSlotSerializer(
             slots,
@@ -78,7 +83,7 @@ class DemoSlotListView(APIView):
            status.HTTP_200_OK
 )
     
-class BookDemoClassView(APIView):
+class BookClassView(APIView):
 
     permission_classes = [IsAuthenticated]
 
@@ -107,7 +112,7 @@ class BookDemoClassView(APIView):
                  status.HTTP_400_BAD_REQUEST
 )
 
-        booking = DemoBooking.objects.create(
+        booking = CourseBooking.objects.create(
             student=request.user,
             course=course,
             teacher=slot.teacher,
@@ -120,14 +125,14 @@ class BookDemoClassView(APIView):
 
         return api_response(
           True,
-          "Demo Class Booked Successfully",
+          "Class Booked Successfully",
           {
               "booking_id": booking.id
           },
           status.HTTP_201_CREATED
 )
     
-class DemoBookingDetailView(APIView):
+class CourseBookingDetailView(APIView):
 
     permission_classes = [IsAuthenticated]
 
@@ -135,12 +140,12 @@ class DemoBookingDetailView(APIView):
 
         try:
 
-            booking = DemoBooking.objects.get(
+            booking = CourseBooking.objects.get(
                 id=booking_id,
                 student=request.user
             )
 
-        except DemoBooking.DoesNotExist:
+        except CourseBooking.DoesNotExist:
 
             return api_response(
                False,
@@ -148,9 +153,9 @@ class DemoBookingDetailView(APIView):
                None,
                status.HTTP_404_NOT_FOUND
 )
-        serializer = DemoBookingDetailSerializer(
+        serializer = CourseBookingDetailSerializer(
             booking
-        )
+         )
 
         return api_response(
               True,
@@ -158,3 +163,77 @@ class DemoBookingDetailView(APIView):
               serializer.data,
               status.HTTP_200_OK
 )
+    
+
+class CreatePaymentView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        booking_id = request.data.get("booking_id")
+        payment_method = request.data.get("payment_method")
+
+        try:
+
+            booking = CourseBooking.objects.get(
+                id=booking_id,
+                student=request.user
+            )
+
+        except CourseBooking.DoesNotExist:
+
+            return api_response(
+                False,
+                "Booking not found",
+                None,
+                status.HTTP_404_NOT_FOUND
+            )
+
+        payment = Payment.objects.create(
+            booking=booking,
+            amount=booking.course.price,
+            payment_method=payment_method,
+            status='pending'
+        )
+
+        return api_response(
+            True,
+            "Payment created successfully",
+            {
+                "payment_id": payment.id,
+                "amount": payment.amount
+            },
+            status.HTTP_201_CREATED
+        )
+    
+class PaymentDetailView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, payment_id):
+
+        try:
+
+            payment = Payment.objects.get(
+                id=payment_id,
+                booking__student=request.user
+            )
+
+        except Payment.DoesNotExist:
+
+            return api_response(
+                False,
+                "Payment not found",
+                None,
+                status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = PaymentSerializer(payment)
+
+        return api_response(
+            True,
+            "Payment details fetched successfully",
+            serializer.data,
+            status.HTTP_200_OK
+        )
