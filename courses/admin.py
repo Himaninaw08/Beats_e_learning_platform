@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, DemoSlot, CourseBooking
+from .models import Course, DemoSlot, CourseBooking,Payment
 
 
 @admin.register(Course)
@@ -47,3 +47,26 @@ class CourseBookingAdmin(admin.ModelAdmin):
     )
 
     list_filter = ('status',)
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+
+    list_display = [
+        'id',
+        'booking',
+        'amount',
+        'payment_method',
+        'status',
+        'created_at'
+    ]
+
+    list_filter = [
+        'status',
+        'payment_method'
+    ]
+
+    search_fields = [
+        'booking__student__email',
+        'booking__course__title',
+        'payu_transaction_id'
+    ]

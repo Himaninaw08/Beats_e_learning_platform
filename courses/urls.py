@@ -8,6 +8,7 @@ from .views import (
     CourseBookingDetailView,
     CreatePaymentView,
     PaymentDetailView,
+    BookingFeeStatusView,
 )
 
 urlpatterns = [
@@ -50,4 +51,6 @@ urlpatterns = [
     'payments/<int:payment_id>/',
         PaymentDetailView.as_view()
     ),  
+
+    path('booking/<int:booking_id>/fee-status/', BookingFeeStatusView.as_view()),
 ]

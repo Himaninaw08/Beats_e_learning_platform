@@ -104,6 +104,7 @@ class CourseBooking(models.Model):
         choices=STATUS_CHOICES,
         default='confirmed'
     )
+    expiry_date = models.DateField(null=True, blank=True)  
 
     created_at = models.DateTimeField(
         auto_now_add=True
@@ -126,7 +127,7 @@ class Payment(models.Model):
         ('failed', 'Failed'),
     )
 
-    booking = models.OneToOneField(
+    booking = models.ForeignKey(
         CourseBooking,
         on_delete=models.CASCADE,
         related_name='payment'

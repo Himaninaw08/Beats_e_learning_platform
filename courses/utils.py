@@ -1,44 +1,44 @@
-from rest_framework.views import exception_handler
-from rest_framework.response import Response
+# from rest_framework.views import exception_handler
+# from rest_framework.response import Response
 
-def custom_exception_handler(exc, context):
+# def custom_exception_handler(exc, context):
 
-    response = exception_handler(exc, context)
+#     response = exception_handler(exc, context)
 
-    if response is not None:
+#     if response is not None:
 
-        message = "Request failed"
+#         message = "Request failed"
 
-        if isinstance(response.data, dict):
+#         if isinstance(response.data, dict):
 
-            if "detail" in response.data:
-                message = response.data["detail"]
+#             if "detail" in response.data:
+#                 message = response.data["detail"]
 
-            else:
-                first_error = next(iter(response.data.values()))
+#             else:
+#                 first_error = next(iter(response.data.values()))
 
-                if isinstance(first_error, list):
-                    message = first_error[0]
+#                 if isinstance(first_error, list):
+#                     message = first_error[0]
+# # 
+#         response.data = {
+#             "status": False,
+#             "message": message,
+#             "data": response.data
+#         }
 
-        response.data = {
-            "status": False,
-            "message": message,
-            "data": response.data
-        }
+#     return response
 
-    return response
-
-def api_response(
-    status_bool,
-    message,
-    data=None,
-    http_status=200
-):
-    return Response(
-        {
-            "status": status_bool,
-            "message": message,
-            "data": data
-        },
-        status=http_status
-    )
+# def api_response(
+#     status_bool,
+#     message,
+#     data=None,
+#     http_status=200
+# ):
+#     return Response(
+#         {
+#             "status": status_bool,
+#             "message": message,
+#             "data": data
+#         },
+#         status=http_status
+#     )

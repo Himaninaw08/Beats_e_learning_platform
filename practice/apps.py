@@ -1,10 +1,9 @@
 from django.apps import AppConfig
 
-
-class CoursesConfig(AppConfig):
+class PracticeConfig(AppConfig):
 
     default_auto_field = 'django.db.models.BigAutoField'
 
-    name = 'courses'
-
-    verbose_name = 'Courses'
+    name = 'practice'
+    
+    verbose_name = 'practice'

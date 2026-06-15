@@ -42,9 +42,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'accounts', 
-    'courses',
+    # 'accounts', 
+    # 'courses',
+    # 'notifications',
     "rest_framework",
+    'accounts.apps.AccountsConfig',
+    'courses.apps.CoursesConfig',
+    'notifications.apps.NotificationsConfig',
+  
+    'practice.apps.PracticeConfig',
+    
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
 ]
@@ -107,7 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'EXCEPTION_HANDLER':
-    'accounts.utils.custom_exception_handler',
+    'beats_academy.utils.custom_exception_handler',
 
      'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }

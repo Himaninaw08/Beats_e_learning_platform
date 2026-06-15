@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import APIException
+from beats_academy.utils import api_response  
+from beats_academy.utils import custom_exception_handler 
 
 
 class RegisterView(generics.CreateAPIView):

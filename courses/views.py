@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -6,7 +8,10 @@ from rest_framework import status
 from .models import Course, DemoSlot, CourseBooking,Payment
 from .serializers import CourseListSerializer,CourseDetailSerializer,DemoSlotSerializer,CourseBookingSerializer,CourseBookingDetailSerializer,PaymentSerializer
 from rest_framework.exceptions import NotFound
-from .utils import api_response
+from beats_academy.utils import api_response  
+from django.utils import timezone
+from notifications.models import Notification
+from beats_academy.utils import custom_exception_handler 
 
 
 
@@ -117,7 +122,8 @@ class BookClassView(APIView):
             course=course,
             teacher=slot.teacher,
             slot=slot,
-            status='confirmed'
+            status='confirmed',
+            expiry_date=timezone.now().date() + timedelta(days=30)
         )
 
         slot.is_booked = True
@@ -127,7 +133,8 @@ class BookClassView(APIView):
           True,
           "Class Booked Successfully",
           {
-              "booking_id": booking.id
+              "booking_id": booking.id,
+              "expiry_date": booking.expiry_date 
           },
           status.HTTP_201_CREATED
 )
@@ -235,5 +242,51 @@ class PaymentDetailView(APIView):
             True,
             "Payment details fetched successfully",
             serializer.data,
+            status.HTTP_200_OK
+        )
+    
+
+
+class BookingFeeStatusView(APIView):
+
+    permission_classes = [IsAuthenticated]
+ 
+    def get(self, request, booking_id):
+
+        try:
+            booking = CourseBooking.objects.get(
+                id=booking_id,
+                student=request.user
+            )
+        except CourseBooking.DoesNotExist:
+            return api_response(
+                False, "Booking not found", None, status.HTTP_404_NOT_FOUND
+            )
+
+        days_left = (booking.expiry_date - timezone.now().date()).days
+        paid = Payment.objects.filter(booking=booking, status='success').exists()
+
+        if 0 <= days_left <= 5 and not paid:
+            already_sent = Notification.objects.filter(
+                user=request.user,
+                title="Fee Payment Reminder",
+                created_at__date=timezone.now().date()
+            ).exists()
+            if not already_sent:
+                Notification.objects.create(
+                    user=request.user,
+                    title="Fee Payment Reminder",
+                    message=f"Your fee expires in {days_left} days. Amount due: ₹{booking.course.price}"
+                )
+
+        return api_response(
+            True,
+            "Status fetched successfully",
+            {
+                "days_left": days_left,
+                "is_expired": days_left <= 0,
+                "amount_due": booking.course.price,
+                "show_popup": 0 <= days_left <= 5
+            },
             status.HTTP_200_OK
         )
